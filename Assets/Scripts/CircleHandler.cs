@@ -1,16 +1,20 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class CircleHandler : MonoBehaviour
 {
-    public int Row { get; private set; }
-    public int Col { get; private set; }
-    public int Type { get; private set; } 
+    private SpriteRenderer _spriteRenderer;
+    public int Row { get; set; }
+    public int Col { get; set; }
+    public int Type { get; set; }
 
-    public void Initialize(int row, int col, int type)
+    private void Awake()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>(); 
+    }
+    public void Initialize(int row, int col, int type, Color[] typesOfColors)
     {
         UpdatePosition(row, col);
-        UpdateType(type);
+        UpdateType(type, typesOfColors);
     }
 
     public void UpdatePosition(int row, int col)
@@ -19,15 +23,15 @@ public class CircleHandler : MonoBehaviour
         Col = col;
     }
 
-    public void UpdateType(int newType)
+    public void UpdateType(int newType , Color[] typesOfColors)
     {
+        
+        if (newType < 0 || newType > typesOfColors.Length)
+            return;
+        
         Type = newType;
-        
-    }
-     private void OnDestroy()
-    {
-        
-        transform.DOKill();
+        _spriteRenderer.color = typesOfColors[newType];
+
     }
 }
 

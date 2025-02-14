@@ -5,85 +5,93 @@ using System.Collections;
 public class ScoreManager : MonoBehaviour
 {
     [SerializeField] int totalMoves = 20;
-    [SerializeField] int scoreForBlue = 50;
-    [SerializeField] int scoreForRed = 50;
-    [SerializeField] int scoreForYellow = 50;
+    [SerializeField] int scoreOfBlue;
+    [SerializeField] int scoreOfLightBlue;
+    [SerializeField] int scoreOfPurple;
+    [SerializeField] int scoreOfRed;
+    [SerializeField] int scoreOfYellow;
+    [Header("For Developer")]
     [SerializeField] GameObject finishUI;
-    private Dictionary<int, int> scoresByType = new Dictionary<int, int>();
-    private CircleController myCircleController; 
+    [SerializeField] CircleController circleController;
+    private Dictionary<int, int> _scoresByType = new Dictionary<int, int>();
+    private bool _isVictory;
 
     private void Awake() {
-        scoresByType[0] = scoreForBlue;
-        scoresByType[3] = scoreForRed;
-        scoresByType[4] = scoreForYellow;
-
-        myCircleController = FindFirstObjectByType<CircleController>();
+        _scoresByType[0] = scoreOfBlue;
+        _scoresByType[1] = scoreOfLightBlue;
+        _scoresByType[2] = scoreOfPurple;
+        _scoresByType[3] = scoreOfRed;
+        _scoresByType[4] = scoreOfYellow;
     }
     private void OnEnable()
     {
-        GameEvents.OnScoreAddedByType += AddScoreByType;
+        GameEvents.OnScoreDecreaseByType += DecreaseScoreByType;
         GameEvents.OnMoveDecrease += DecreaseMove;
     }
 
     private void OnDisable()
     {
-        GameEvents.OnScoreAddedByType -= AddScoreByType;
+        GameEvents.OnScoreDecreaseByType -= DecreaseScoreByType;
         GameEvents.OnMoveDecrease -= DecreaseMove;
     }
 
-    private void AddScoreByType(int points, int type)
+    private void DecreaseScoreByType(int type)
     {
-        if (!scoresByType.ContainsKey(type))
+        if (!_scoresByType.ContainsKey(type))
         {
-            scoresByType[type] = 0; 
+            _scoresByType[type] = 0; 
         }
 
-        scoresByType[type] -= points;
-        Debug.Log($"Score Updated - Type {type}: {scoresByType[type]}");
+        _scoresByType[type]--;
 
-        if(scoresByType[type] <= 0)
+        if(_scoresByType[type] <= 0)
         {
-          scoresByType[type] = 0;
+          _scoresByType[type] = 0;
 
-          if(scoresByType[0] == 0 && scoresByType[3] == 0 && scoresByType[4] == 0)
+          int isAllTypesZeroCount = 0;
+          for (int i = 0; i < _scoresByType.Count; i++)
           {
-            StartCoroutine(EndGame(true));
-          }  
+              if (_scoresByType[i] == 0)
+              {
+                  isAllTypesZeroCount++;
+              }
+
+              if (isAllTypesZeroCount == _scoresByType.Count)
+              {
+                _isVictory = true;  
+                StartCoroutine(EndGame());
+              }
+          }
         }
         
     }
 
     public int GetScoreByType(int type)
     {
-        return scoresByType.ContainsKey(type) ? scoresByType[type] : 0;
+        return _scoresByType.ContainsKey(type) ? _scoresByType[type] : 0;
     }
 
-    public Dictionary<int, int> GetAllScores()
+    public void DecreaseMove()
     {
-        return scoresByType;
-    }
-
-    public void DecreaseMove(int amount)
-    {
-        totalMoves -= amount;
-        Debug.Log($"Moves Remaining: {totalMoves}");
+        totalMoves --;
 
         if (totalMoves <= 0)
         {
             totalMoves = 0;
-            StartCoroutine(EndGame(false));
+            StartCoroutine(EndGame());
         }
     }
-    private IEnumerator EndGame(bool isVictory)
+    private IEnumerator EndGame()
     {
+        circleController.IsMouseInputActive = false;
+        
+        yield return new WaitForSeconds(1f);
+        
         finishUI.SetActive(true);
 
-        var message = isVictory ? "You Win!" : "Out of Moves!";
+        string message = _isVictory ? "You Win!" : "Out of Moves!";
         finishUI.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = message;
-
-        yield return new WaitForSeconds(1f);
-
-        myCircleController.gameObject.SetActive(false);
+        
     }
     public int GetRemainingMoves()
     {

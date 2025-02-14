@@ -137,3 +137,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 531e2aa3272a13b46a3f959914d5fc3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  circleColors: []

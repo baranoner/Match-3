@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] float spacing = 1.1f;
     [SerializeField] float dropDuration = 0.5f;
     [SerializeField] float staggerDelay = 0.05f;
-
+    [Header("For Developer")]
     [SerializeField] GameBoard gameBoard;
 
     void Start()

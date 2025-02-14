@@ -1,58 +1,65 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ScoreUI : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI blueScoreText;
-    [SerializeField] TextMeshProUGUI redScoreText;
-    [SerializeField] TextMeshProUGUI yellowScoreText;
+    [SerializeField] TextMeshProUGUI scoreTextType0;
+    [SerializeField] TextMeshProUGUI scoreTextType1;
+    [SerializeField] TextMeshProUGUI scoreTextType2;
+    [SerializeField] TextMeshProUGUI scoreTextType3;
+    [SerializeField] TextMeshProUGUI scoreTextType4;
+    [Header("For Developer")]
     [SerializeField] TextMeshProUGUI movesText;
-
-    private ScoreManager myScoreManager;
-
-    void Awake() 
-    {
-    myScoreManager = FindFirstObjectByType<ScoreManager>();
-    }
+    [SerializeField] ScoreManager scoreManager;
+    
     private void Start() {
-        blueScoreText.text = myScoreManager.GetScoreByType(0).ToString();
-        redScoreText.text =  myScoreManager.GetScoreByType(3).ToString();
-        yellowScoreText.text = myScoreManager.GetScoreByType(4).ToString();
-
-        UpdateMovesUI(myScoreManager.GetRemainingMoves());
+        UpdateScoreUI(-1);
+        UpdateMovesUI();
     }
 
     private void OnEnable()
     {
-        GameEvents.OnScoreAddedByType += UpdateScoreUI;
+        GameEvents.OnScoreDecreaseByType += UpdateScoreUI;
         GameEvents.OnMoveDecrease += UpdateMovesUI;
     }
 
     private void OnDisable()
     {
-        GameEvents.OnScoreAddedByType -= UpdateScoreUI;
+        GameEvents.OnScoreDecreaseByType -= UpdateScoreUI;
         GameEvents.OnMoveDecrease -= UpdateMovesUI;
     }
 
-    private void UpdateScoreUI(int points, int type)
+    private void UpdateScoreUI(int type)
     {
         switch (type)
         {
-            case 0: // Blue
-                blueScoreText.text = myScoreManager.GetScoreByType(0).ToString();
+            case -1:
+                scoreTextType0!.text = scoreManager.GetScoreByType(0).ToString();
+                scoreTextType1!.text = scoreManager.GetScoreByType(1).ToString();
+                scoreTextType2!.text = scoreManager.GetScoreByType(2).ToString();
+                scoreTextType3!.text = scoreManager.GetScoreByType(3).ToString();
+                scoreTextType4!.text = scoreManager.GetScoreByType(4).ToString();
                 break;
-            case 3: // Red
-                redScoreText.text =  myScoreManager.GetScoreByType(3).ToString();
+            case 0:
+                scoreTextType0!.text = scoreManager.GetScoreByType(0).ToString();
                 break;
-            case 4: // Yellow
-                yellowScoreText.text = myScoreManager.GetScoreByType(4).ToString();
+            case 1:
+                scoreTextType1!.text = scoreManager.GetScoreByType(1).ToString();
+                break;
+            case 2:
+                scoreTextType2!.text = scoreManager.GetScoreByType(2).ToString();
+                break;
+            case 3:
+                scoreTextType3!.text = scoreManager.GetScoreByType(3).ToString();
+                break;
+            case 4:
+                scoreTextType4!.text = scoreManager.GetScoreByType(4).ToString();
                 break;
         }
     }
-    private void UpdateMovesUI(int moves)
+    private void UpdateMovesUI()
     {
-        moves = myScoreManager.GetRemainingMoves();
+        int moves = scoreManager.GetRemainingMoves();
         movesText.text = $"Moves: {moves}";
     }
 }
